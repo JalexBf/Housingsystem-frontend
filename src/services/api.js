@@ -1,36 +1,61 @@
 import axios from 'axios';
 
-// Create an Axios instance with default settings
 const API = axios.create({
-  baseURL: 'http://localhost:8080', // Replace with your backend's base URL
-  timeout: 5000, // Optional: Set a timeout for requests
+  baseURL: 'http://localhost:8080',
+  timeout: 5000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true,
 });
 
-// Interceptor to include Authorization header with JWT token if available
 API.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token'); // Retrieve the JWT token from localStorage
+    const token = localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`; // Add Authorization header
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
+    console.error('Request error:', error);
     return Promise.reject(error);
   }
 );
 
-// Interceptor to handle responses globally (e.g., logging out on 401 Unauthorized)
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // Handle unauthorized requests, e.g., redirect to login page
-      console.error('Unauthorized! Redirecting to login...');
-      localStorage.removeItem('token'); // Clear token
-      window.location.href = '/login'; // Redirect to login page
+
+    const responseData = error.response?.data || {};
+    const errorMessage = responseData.message || "An unexpected error occurred.";
+
+    if (error.response) {
+      const { status } = error.response;
+      
+      if (status === 401) {
+        if (errorMessage.includes('pending approval')) {
+          console.error('Login failed: User is not yet approved.');
+          return Promise.reject(new Error('Your account is pending approval by the admin.'));
+        } else {
+          console.error('Login failed: Invalid credentials.');
+          return Promise.reject(new Error('Invalid username or password.'));
+        }
+      }else if (status === 403) {
+        console.error('Forbidden: User does not have access.');
+        return Promise.reject(new Error('You do not have permission to access this resource.'));
+      }else if (status === 500) {
+        console.error('Server error! Please try again later.');
+        return Promise.reject(new Error('An unexpected error occurred. Please try again later.'));
+      }
+    }else if (error.request) {
+      console.error('No response received from the server:', error.request);
+      return Promise.reject(new Error('Unable to reach the server. Please check your connection.'));
+    }else {
+      console.error('Error:', error.message);
     }
-    return Promise.reject(error);
+
+    return Promise.reject(new Error(errorMessage));
   }
 );
 

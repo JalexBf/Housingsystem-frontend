@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Box, Typography, Paper } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import API from '../services/api';
@@ -7,30 +7,53 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (error) {
+      console.log('Error occurred:', error);  // Debug without refreshing the page
+    }
+  }, [error]);
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(''); // Reset any previous errors
+    setIsLoading(true);
+    setError('');
 
     if (!username || !password) {
       setError('Please fill in both fields.');
+      setIsLoading(false);
       return;
     }
 
     try {
       const response = await API.post('/api/auth/login', { username, password });
-      const { token } = response.data;
+      const { accessToken, roles } = response.data;
 
-      // Save token to localStorage for future requests
-      localStorage.setItem('token', token);
+      if (!accessToken) {
+        setError('Login failed: Token not received from the server.');
+        setIsLoading(false);
+        return;
+      }
 
-      alert('Login successful!');
-      navigate('/dashboard'); // Redirect to dashboard or another page
+      localStorage.setItem('token', accessToken); // Fix token storage
+
+      const role = roles[0];
+      if (role === 'ROLE_TENANT') {
+        window.location.href = '/tenant-dashboard';
+      } else if (role === 'ROLE_OWNER') {
+        window.location.href = '/owner-dashboard';
+      } else if (role === 'ROLE_ADMIN') {
+        setError('The Admin enters through the Backend.');
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid username or password.');
+      setError(err.message || "An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
+
 
   return (
     <Box
@@ -38,16 +61,16 @@ const Login = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '100vw', // Full viewport width
-        height: '100vh', // Full viewport height
-        backgroundColor: '#f5f5f5', // Light background
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: '#f5f5f5',
       }}
     >
       <Paper
         elevation={3}
         sx={{
           padding: 4,
-          width: { xs: '90%', sm: '400px' }, // Responsive width
+          width: { xs: '90%', sm: '400px' },
           textAlign: 'center',
           backgroundColor: '#fff',
         }}
@@ -76,7 +99,7 @@ const Login = () => {
             required
           />
           {error && (
-            <Typography color="error" sx={{ marginTop: 1 }}>
+            <Typography color="error" sx={{ marginTop: 1, padding: 1, backgroundColor: "#ffe6e6", borderRadius: "5px" }}>
               {error}
             </Typography>
           )}
@@ -85,12 +108,13 @@ const Login = () => {
             fullWidth
             variant="contained"
             sx={{ marginTop: 2 }}
+            disabled={isLoading}
           >
-            Login
+            {isLoading ? 'Logging in...' : 'Login'}
           </Button>
         </form>
         <Typography sx={{ marginTop: 2 }}>
-          Don&apos;t have an account? <Link to="/signup">Sign Up</Link> {/* Add the link */}
+          Don&apos;t have an account? <Link to="/signup">Sign Up</Link>
         </Typography>
       </Paper>
     </Box>
