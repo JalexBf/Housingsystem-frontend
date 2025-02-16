@@ -12,7 +12,22 @@ const PropertyDetails = () => {
     useEffect(() => {
         const fetchPropertyDetails = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/properties/${id}`);
+                const token = localStorage.getItem("token");
+                if (!token) {
+                    console.error("No authentication token found.");
+                    setLoading(false);
+                    return;
+                }
+
+                const response = await axios.get(`http://localhost:8080/api/properties/${id}`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                    },
+                    withCredentials: true,
+                });
+
                 setProperty(response.data);
             } catch (error) {
                 console.error("Error fetching property details:", error);
@@ -23,6 +38,7 @@ const PropertyDetails = () => {
 
         fetchPropertyDetails();
     }, [id]);
+
 
     if (loading) {
         return (

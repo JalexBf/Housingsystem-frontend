@@ -10,10 +10,11 @@ import {
   FormControl,
   InputLabel,
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -108,12 +109,14 @@ const Signup = () => {
         headers: { 'Content-Type': 'application/json' },
       });
 
-      setSuccess(response.data.message || 'User registered successfully!');
-      setResponsePayload(response.data.payload); // Debug JSON response from backend
+      setSuccess('User registered successfully! Redirecting to login...');
+
+      setTimeout(() => {
+        navigate('/login'); 
+      }, 1500);
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong. Please try again.');
       if (err.response?.data?.payload) {
-        setResponsePayload(err.response.data.payload); // Debug JSON response on error
       }
     }
   };
