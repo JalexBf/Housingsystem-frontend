@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Card, CardContent, CardMedia, Grid } from "@mui/material";
+import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
+import { Box, Typography, Card, CardContent, CardMedia, Grid, Button, CircularProgress } from "@mui/material";
 import axios from "axios";
 
 const MyProperties = () => {
-    const [properties, setProperties] = useState([]);
+    const [properties, setProperties] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate(); // ✅ Initialize navigation
 
     useEffect(() => {
-        const fetchProperty = async () => {
+        const fetchProperties = async () => {
             try {
                 const token = localStorage.getItem("token");
                 if (!token) {
                     console.error("No authentication token found.");
+                    setLoading(false);
                     return;
                 }
-
-                console.log("Sending token:", token);
 
                 const response = await axios.get("http://localhost:8080/api/properties", {
                     headers: {
@@ -25,23 +27,54 @@ const MyProperties = () => {
                     withCredentials: true,
                 });
 
-                console.log("API Response:", response.data);
                 setProperties(response.data);
             } catch (error) {
-                console.error("Failed to fetch property:", error);
+                console.error("Failed to fetch properties:", error);
+            } finally {
+                setLoading(false);
             }
         };
-        fetchProperty();
+
+        fetchProperties();
     }, []);
 
-    if (properties.length === 0) {
+    const handleView = (propertyId) => {
+        navigate(`/property/${propertyId}`); // ✅ Navigate to property details page
+    };
+
+    const handleDelete = async (propertyId) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this property?");
+        if (!confirmDelete) return;
+
+        try {
+            const token = localStorage.getItem("token");
+            await axios.delete(`http://localhost:8080/api/properties/${propertyId}`, {
+                headers: { "Authorization": `Bearer ${token}` },
+            });
+
+            // ✅ Remove the deleted property from the state
+            setProperties((prevProperties) => prevProperties.filter((p) => p.id !== propertyId));
+        } catch (error) {
+            console.error("Failed to delete property:", error);
+        }
+    };
+
+    if (loading) {
+        return (
+            <Box sx={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    if (!properties || properties.length === 0) {
         return <Typography sx={{ padding: 4 }}>No properties found.</Typography>;
     }
 
     return (
         <Box sx={{ padding: 4 }}>
             <Grid container spacing={2}>
-                {properties.map(property => (
+                {properties.map((property) => (
                     <Grid item xs={12} sm={8} md={6} key={property.id}>
                         <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
                             {property.firstPhotoUrl && (
@@ -59,6 +92,25 @@ const MyProperties = () => {
                                         ? `${property.category}, ${property.area}`
                                         : "Property Info Unavailable"}
                                 </Typography>
+
+                                {/* ✅ Fix: Wrap buttons inside a properly defined Box */}
+                                <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, marginTop: 2 }}>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={() => handleView(property.id)}
+                                    >
+                                        Προβολή
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        color="error"
+                                        onClick={() => handleDelete(property.id)}
+                                    >
+                                        ΔΙΑΓΡΑΦΗ
+                                    </Button>
+                                </Box>
+
                             </CardContent>
                         </Card>
                     </Grid>
