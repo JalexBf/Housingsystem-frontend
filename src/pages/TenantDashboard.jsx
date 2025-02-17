@@ -19,7 +19,12 @@ const TenantDashboard = () => {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
             })
-                .then((response) => setTenant(response.data))
+                .then(response => {
+                    console.log("Received tenant data:", response.data);
+                    setTenant(response.data);
+                    console.log("Type of response data:", typeof response.data);
+                    console.log("Is response an array?", Array.isArray(response.data));
+                })
                 .catch((error) => console.error("Error fetching tenant info:", error));
                 console.log("tenant on dashboard: ", tenant)
         }else {
@@ -71,11 +76,8 @@ const TenantDashboard = () => {
                     <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("/available")}>
                         View Available Properties
                     </Button>
-                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("/rental-requests")}>
-                        Manage Rental Requests
-                    </Button>
-                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("/viewing-requests")}>
-                        Manage Viewing Requests
+                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("//manage-requests")}>
+                        Manage Requests
                     </Button>
                 </Box>
             </Box>

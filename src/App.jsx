@@ -7,6 +7,7 @@ import Property from './pages/Property.jsx';
 import Signup from './pages/Signup';
 import TenantDashboard from './pages/TenantDashboard';
 import OwnerDashboard from './pages/OwnerDashboard';
+import ManageRequests from "./pages/ManageRequests";
 import AvailableProperties from "./pages/AvailableProperties"; // Import the page
 import TenantProfile from './pages/TenantProfile';
 
@@ -24,6 +25,7 @@ function App() {
                 <Route path="/tenant-dashboard" element={<TenantDashboard />} />
                 <Route path="/owner-dashboard" element={<OwnerDashboard />} />
                 <Route path="/profile" element={<TenantProfile />} />
+                <Route path="/manage-requests" element={<ManageRequests />} />
             </Routes>
         </Router>
     );
