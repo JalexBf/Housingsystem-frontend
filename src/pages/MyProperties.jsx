@@ -77,19 +77,27 @@ const MyProperties = () => {
                 {properties.map((property) => (
                     <Grid item xs={12} sm={8} md={6} key={property.id}>
                         <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
-                            {property.firstPhotoUrl && (
+                            {property.photos && property.photos.length > 0 ? (
                                 <CardMedia
                                     component="img"
                                     height="250"
-                                    image={`http://localhost:8080/images/${property.firstPhotoUrl}`}
+                                    image={`http://localhost:8080${property.photos[0]}`}  // ✅ Uses first photo
                                     alt="Property Image"
+                                    sx={{ objectFit: "cover" }}
+                                />
+                            ) : (
+                                <CardMedia
+                                    component="img"
+                                    height="250"
+                                    image="/default-image.jpg"  // ✅ Fallback image
+                                    alt="No Image Available"
                                     sx={{ objectFit: "cover" }}
                                 />
                             )}
                             <CardContent>
                                 <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                                     {property.category && property.area
-                                        ? `${property.category}, ${property.area}`
+                                        ? `${property.category.charAt(0) + property.category.slice(1).toLowerCase()}, ${property.area}`
                                         : "Property Info Unavailable"}
                                 </Typography>
 

@@ -1,33 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Box, Typography, Card, CardMedia, CircularProgress, Button } from "@mui/material";
+import { useParams } from "react-router-dom";
 import axios from "axios";
+import { Box, Typography, CircularProgress, Divider } from "@mui/material";
 
 const PropertyDetails = () => {
-    const { id } = useParams(); // Get property ID from URL
-    const navigate = useNavigate();
+    const { id } = useParams();
     const [property, setProperty] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchPropertyDetails = async () => {
             try {
-                const token = localStorage.getItem("token");
-                if (!token) {
-                    console.error("No authentication token found.");
-                    setLoading(false);
-                    return;
-                }
-
-                const response = await axios.get(`http://localhost:8080/api/properties/${id}`, {
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Accept": "application/json",
-                        "Content-Type": "application/json",
-                    },
-                    withCredentials: true,
-                });
-
+                const response = await axios.get(`http://localhost:8080/api/properties/${id}`);
+                console.log("API Response:", response.data);
                 setProperty(response.data);
             } catch (error) {
                 console.error("Error fetching property details:", error);
@@ -39,10 +24,9 @@ const PropertyDetails = () => {
         fetchPropertyDetails();
     }, [id]);
 
-
     if (loading) {
         return (
-            <Box sx={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
                 <CircularProgress />
             </Box>
         );
@@ -53,39 +37,84 @@ const PropertyDetails = () => {
     }
 
     return (
-        <Box sx={{ padding: 4 }}>
-            <Button onClick={() => navigate(-1)} variant="contained" sx={{ marginBottom: 2 }}>
-                ⬅ Back
-            </Button>
-
+        <Box sx={{ padding: 4, maxWidth: 800, margin: "auto" }}>
+            {/* Title and Basic Details */}
             <Typography variant="h4" sx={{ fontWeight: "bold", marginBottom: 2 }}>
-                {property.category}, {property.area}
+                {property.category ? property.category.charAt(0) + property.category.slice(1).toLowerCase() : "Unknown"}
+                {property.area ? `, ${property.area}` : ""}
             </Typography>
 
-            {/* Property Images */}
-            <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-                {property.photos.map((photo, index) => (
-                    <Card key={index} sx={{ maxWidth: 300 }}>
-                        <CardMedia
-                            component="img"
-                            height="200"
-                            image={`http://localhost:8080/images/${photo.filePath}`}
-                            alt={`Property image ${index + 1}`}
+            <Typography variant="body1">
+                📍 <strong>Address:</strong> {property.address && property.address.trim() !== "" ? property.address : "No address available"}
+            </Typography>
+
+            <Typography variant="body1">💰 <strong>Price:</strong> {property.price ? `€${property.price}` : "Not listed"}</Typography>
+
+            <Typography variant="body1">
+                📐 <strong>Square Meters:</strong> {property.squareMeters ? `${property.squareMeters} m²` : "Not specified"}
+            </Typography>
+
+            <Divider sx={{ marginY: 2 }} />
+
+            {/* Additional Property Details */}
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>Property Details</Typography>
+
+            <Typography variant="body1">🏢 <strong>Floor:</strong> {property.floor ? property.floor : "Not specified"}</Typography>
+            <Typography variant="body1">🚪 <strong>Rooms:</strong> {property.numberOfRooms ? property.numberOfRooms : "Not specified"}</Typography>
+            <Typography variant="body1">🚿 <strong>Bathrooms:</strong> {property.numberOfBathrooms ? property.numberOfBathrooms : "Not specified"}</Typography>
+            <Typography variant="body1">🛠️ <strong>Renovation Year:</strong> {property.renovationYear ? property.renovationYear : "Not specified"}</Typography>
+            <Typography variant="body1">📝 <strong>ATAK:</strong> {property.atak ? property.atak : "Not specified"}</Typography>
+
+            {/* Amenities List */}
+            <Typography variant="body1" sx={{ fontWeight: "bold", display: "inline" }}>
+                🏠 Amenities:
+            </Typography>
+            <Typography variant="body1" sx={{ display: "inline" }}>
+                {property.amenities && property.amenities.length > 0 ? (
+                    <ul style={{ display: "inline", marginLeft: "8px", padding: "0" }}>
+                        {property.amenities.map((amenity, index) => (
+                            <li key={index} style={{ display: "inline", marginRight: "8px" }}>
+                                {amenity}{index < property.amenities.length - 1 ? "," : ""}
+                            </li>
+                        ))}
+                    </ul>
+                ) : " -"}
+            </Typography>
+            {/* Availability Slots */}
+            <Typography variant="body1" sx={{ fontWeight: "bold", marginTop: 2 }}>
+                Availability:
+            </Typography>
+            {property.availabilitySlots && property.availabilitySlots.length > 0 ? (
+                <Box component="ul" sx={{ margin: 0, paddingLeft: 2 }}>
+                    {property.availabilitySlots.map((slot, index) => (
+                        <Typography key={index} component="li">
+                            {slot}
+                        </Typography>
+                    ))}
+                </Box>
+            ) : (
+                <Typography variant="body1" sx={{ display: "inline" }}> -</Typography>
+            )}
+
+            <Divider sx={{ marginY: 2 }} />
+
+            {/* Photos */}
+            <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 1 }}>Photos</Typography>
+            <Box sx={{ display: "flex", gap: 2, marginTop: 2, overflowX: "auto" }}>
+                {property.photos && property.photos.length > 0 ? (
+                    property.photos.map((photoUrl, index) => (
+                        <img
+                            key={index}
+                            src={`http://localhost:8080${photoUrl}`}
+                            alt="Property"
+                            width="200"
+                            onError={(e) => { e.target.onerror = null; e.target.src = "/default-image.jpg"; }}
                         />
-                    </Card>
-                ))}
+                    ))
+                ) : (
+                    <Typography>No photos available.</Typography>
+                )}
             </Box>
-
-            {/* Property Details */}
-            <Typography variant="body1" sx={{ marginTop: 2 }}>
-                <strong>Location:</strong> {property.location}
-            </Typography>
-            <Typography variant="body1">
-                <strong>Size:</strong> {property.squareMeters} sqm
-            </Typography>
-            <Typography variant="body1">
-                <strong>Price:</strong> {property.price}€
-            </Typography>
         </Box>
     );
 };
