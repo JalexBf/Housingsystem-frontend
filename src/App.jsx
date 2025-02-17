@@ -10,6 +10,8 @@ import Unauthorized from './pages/Unauthorized';
 import AddProperty from './pages/AddProperty';
 import MyProperties from "./pages/MyProperties";
 import PropertyDetails from "./pages/PropertyDetails";
+import PropertySearch from "./pages/PropertySearch";
+
 
 
 function App() {
@@ -19,7 +21,9 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
-                
+                <Route path="/search" element={<PropertySearch />} />
+                <Route path="/property/:id" element={<PropertyDetails />} />
+
                 <Route element={<ProtectedRoute allowedRoles={['ROLE_TENANT']} />}>
                     <Route path="/tenant-dashboard" element={<TenantDashboard />} />
                 </Route>
@@ -28,7 +32,6 @@ function App() {
                     <Route path="/owner-dashboard" element={<OwnerDashboard />} />
                     <Route path="/add-property" element={<AddProperty />} />
                     <Route path="/my-properties" element={<MyProperties />} />
-                    <Route path="/property/:id" element={<PropertyDetails />} />
                 </Route>
 
                 <Route path="/unauthorized" element={<Unauthorized />} />

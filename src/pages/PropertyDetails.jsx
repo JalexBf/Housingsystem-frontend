@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Box, Typography, CircularProgress, Divider } from "@mui/material";
+import { Box, Typography, CircularProgress, Divider, Button } from "@mui/material";
 
 const PropertyDetails = () => {
     const { id } = useParams();
     const [property, setProperty] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [userId, setUserId] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchPropertyDetails = async () => {
@@ -22,7 +24,35 @@ const PropertyDetails = () => {
         };
 
         fetchPropertyDetails();
+
+        // Extract user ID from JWT token
+        const token = localStorage.getItem("token");
+        if (token) {
+            try {
+                const user = JSON.parse(atob(token.split(".")[1])); // Decode JWT
+                setUserId(user.id); // Extract user ID
+            } catch (error) {
+                console.error("Error decoding JWT:", error);
+            }
+        }
     }, [id]);
+
+    const handleDelete = async () => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this property?");
+        if (!confirmDelete) return;
+
+        try {
+            const token = localStorage.getItem("token");
+            await axios.delete(`http://localhost:8080/api/properties/${id}`, {
+                headers: { "Authorization": `Bearer ${token}` },
+            });
+
+            alert("Property deleted successfully!");
+            navigate("/"); // Redirect after deletion
+        } catch (error) {
+            console.error("Failed to delete property:", error);
+        }
+    };
 
     if (loading) {
         return (
@@ -48,7 +78,8 @@ const PropertyDetails = () => {
                 📍 <strong>Address:</strong> {property.address && property.address.trim() !== "" ? property.address : "No address available"}
             </Typography>
 
-            <Typography variant="body1">💰 <strong>Price:</strong> {property.price ? `€${property.price}` : "Not listed"}</Typography>
+            <Typography variant="body1">💰 <strong>Price:</strong> {property.price ? `€${property.price}` : "Not listed"}
+            </Typography>
 
             <Typography variant="body1">
                 📐 <strong>Square Meters:</strong> {property.squareMeters ? `${property.squareMeters} m²` : "Not specified"}
@@ -59,7 +90,8 @@ const PropertyDetails = () => {
             {/* Additional Property Details */}
             <Typography variant="h6" sx={{ fontWeight: "bold" }}>Property Details</Typography>
 
-            <Typography variant="body1">🏢 <strong>Floor:</strong> {property.floor ? property.floor : "Not specified"}</Typography>
+            <Typography variant="body1">🏢 <strong>Floor:</strong> {property.floor ? property.floor : "Not specified"}
+            </Typography>
             <Typography variant="body1">🚪 <strong>Rooms:</strong> {property.numberOfRooms ? property.numberOfRooms : "Not specified"}</Typography>
             <Typography variant="body1">🚿 <strong>Bathrooms:</strong> {property.numberOfBathrooms ? property.numberOfBathrooms : "Not specified"}</Typography>
             <Typography variant="body1">🛠️ <strong>Renovation Year:</strong> {property.renovationYear ? property.renovationYear : "Not specified"}</Typography>
@@ -80,6 +112,7 @@ const PropertyDetails = () => {
                     </ul>
                 ) : " -"}
             </Typography>
+
             {/* Availability Slots */}
             <Typography variant="body1" sx={{ fontWeight: "bold", marginTop: 2 }}>
                 Availability:
@@ -108,13 +141,28 @@ const PropertyDetails = () => {
                             src={`http://localhost:8080${photoUrl}`}
                             alt="Property"
                             width="200"
-                            onError={(e) => { e.target.onerror = null; e.target.src = "/default-image.jpg"; }}
+                            onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = "/default-image.jpg";
+                            }}
                         />
                     ))
                 ) : (
                     <Typography>No photos available.</Typography>
                 )}
             </Box>
+
+            {/* Delete Button (Only for Owner) */}
+            {userId && property.ownerId && userId === property.ownerId && (
+                <Button
+                    variant="contained"
+                    color="error"
+                    onClick={handleDelete}
+                    sx={{ marginTop: 2 }}
+                >
+                    Delete Property
+                </Button>
+            )}
         </Box>
     );
 };
