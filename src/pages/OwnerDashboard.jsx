@@ -62,9 +62,14 @@ export default function OwnerDashboard() {
                     color="primary"
                     size="large"
                     sx={{ marginBottom: 2, width: "300px" }}
+                    onClick={() => {
+                        console.log("Navigating to /manage-viewing-requests");
+                        navigate('/manage-viewing-requests');
+                    }}
                 >
-                    Manage Property Requests
+                    Manage Viewing Requests
                 </Button>
+
             </Box>
         </Box>
     );

@@ -33,26 +33,38 @@ const Login = () => {
     try {
       const response = await API.post('/api/auth/login', { username, password });
 
-      console.log("Login response:", response.data);
+        console.log("Login response:", response.data);
 
-      const { accessToken, roles } = response.data;
+        if (!response.data) {
+            throw new Error("Invalid API response");
+        }
 
-      if (!accessToken) {
-        setError('Login failed: Token not received from the server.');
-        return;
-      }
+        const {
+            accessToken = null,
+            id = null,
+            username: responseUsername = null,
+            roles = []
+        } = response.data;
 
-      localStorage.setItem('token', accessToken);
-      localStorage.setItem('user', JSON.stringify({ role: roles[0] }));
+        if (!accessToken || !id || !responseUsername) {
+            throw new Error("Missing required fields in response");
+        }
 
-      const role = roles[0];
-      if (role === 'ROLE_TENANT') {
-        navigate('/tenant-dashboard');
-      } else if (role === 'ROLE_OWNER') {
-        navigate('/owner-dashboard');
-      } else if (role === 'ROLE_ADMIN') {
-        setError('The Admin enters through the Backend.');
-      }
+        localStorage.setItem('token', accessToken);
+        localStorage.setItem('userId', id);
+        localStorage.setItem('username', responseUsername);
+        localStorage.setItem('user', JSON.stringify({ role: roles[0] }));
+
+        console.log("Stored user ID:", id, "Username:", responseUsername);
+
+        const role = roles[0];
+        if (role === 'ROLE_TENANT') {
+            navigate('/tenant-dashboard');
+        } else if (role === 'ROLE_OWNER') {
+            navigate('/owner-dashboard');
+        } else if (role === 'ROLE_ADMIN') {
+            setError('The Admin enters through the Backend.');
+        }
     } catch (err) {
       setError(err.message);
     } finally {
