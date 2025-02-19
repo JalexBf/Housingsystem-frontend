@@ -1,112 +1,75 @@
-import React, { useState, useEffect } from "react";
-import { Box, TextField, Button, Typography, CircularProgress, MenuItem } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Box, Typography, Grid, Card, CardContent, CardMedia, Button, CircularProgress } from "@mui/material";
 import axios from "axios";
+import SearchBar from "./SearchBar"; // ✅ Import SearchBar
 
 const PropertySearch = () => {
-    const [area, setArea] = useState("");
-    const [date, setDate] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [results, setResults] = useState([]);
-    const [error, setError] = useState("");
-    const [areas, setAreas] = useState([]);
+    const [properties, setProperties] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
-    // Fetch available areas from the backend
     useEffect(() => {
-        axios.get("http://localhost:8080/api/property/area")
-            .then(response => {
-                if (Array.isArray(response.data)) {
-                    setAreas(response.data);
-                } else {
-                    console.error("Unexpected API response:", response.data);
-                    setAreas([]); // Set an empty array to prevent errors
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching areas:", error);
-                setAreas([]); // Prevents 'map' from breaking
-            });
+        fetchProperties();
     }, []);
 
-    const handleSearch = async () => {
-        setLoading(true);
-        setError("");
-
+    const fetchProperties = async (filters = {}) => {
         try {
-            const response = await axios.get("http://localhost:8080/api/properties/searchByAreaAndDate", {
-                params: { area, date }
-            });
+            const queryParams = new URLSearchParams(filters).toString();
+            const url = `http://localhost:8080/api/properties/search?${queryParams}`;
 
-            setResults(response.data);
-        } catch (err) {
-            setError("An error occurred while searching for properties.");
+            const response = await axios.get(url); // ✅ Public API request (No Auth Required)
+            setProperties(response.data);
+        } catch (error) {
+            console.error("Failed to fetch properties:", error);
         } finally {
             setLoading(false);
         }
     };
 
-    return (
-        <Box sx={{ maxWidth: 600, margin: "auto", textAlign: "center" }}>
-            <Typography variant="h6" sx={{ marginBottom: 2 }}>
-                Search for Properties
-            </Typography>
+    if (loading) {
+        return (
+            <Box sx={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
 
-            {/* Area Dropdown */}
-            <TextField
-                select
-                label="Select Area"
-                fullWidth
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-                sx={{ marginBottom: 2 }}
-            >
-                {Array.isArray(areas) && areas.length > 0 ? (
-                    areas.map((a) => (
-                        <MenuItem key={a.id} value={a.name}>
-                            {a.name}
-                        </MenuItem>
+    return (
+        <Box sx={{ padding: 4 }}>
+            <SearchBar onSearch={fetchProperties} /> {/* ✅ Add SearchBar */}
+
+            <Grid container spacing={2}>
+                {properties.length > 0 ? (
+                    properties.map((property) => (
+                        <Grid item xs={12} sm={8} md={6} key={property.id}>
+                            <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
+                                {property.photos && property.photos.length > 0 && (
+                                    <CardMedia
+                                        component="img"
+                                        height="250"
+                                        image={`http://localhost:8080${property.photos[0]}`}
+                                        alt="Property Image"
+                                    />
+                                )}
+                                <CardContent>
+                                    <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                                        {property.category.charAt(0) + property.category.slice(1).toLowerCase()}, {property.area}
+                                    </Typography>
+                                    <Typography variant="body2">Price: €{property.price}</Typography>
+                                    <Typography variant="body2">Rooms: {property.numberOfRooms}</Typography>
+
+                                    <Button variant="contained" color="primary" onClick={() => navigate(`/property/${property.id}`)}>
+                                        View Details
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        </Grid>
                     ))
                 ) : (
-                    <MenuItem disabled>No areas available</MenuItem>
+                    <Typography>No properties found.</Typography>
                 )}
-            </TextField>
-
-            {/* Date Picker */}
-            <TextField
-                type="date"
-                label="Available Date"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                sx={{ marginBottom: 2 }}
-            />
-
-            {/* Search Button */}
-            <Button variant="contained" color="primary" onClick={handleSearch} disabled={loading}>
-                {loading ? "Searching..." : "Search"}
-            </Button>
-
-            {/* Loading Spinner */}
-            {loading && <CircularProgress sx={{ margin: 2 }} />}
-
-            {/* Error Message */}
-            {error && <Typography color="error">{error}</Typography>}
-
-            {/* Results */}
-            {results.length > 0 ? (
-                <Box sx={{ marginTop: 3 }}>
-                    <Typography variant="h6">Search Results:</Typography>
-                    {results.map((property, index) => (
-                        <Box key={index} sx={{ padding: 2, border: "1px solid #ddd", borderRadius: 2, marginTop: 2 }}>
-                            <Typography variant="body1"><strong>{property.name}</strong></Typography>
-                            <Typography variant="body2">{property.location}</Typography>
-                            <Typography variant="body2">{property.price} per month</Typography>
-                        </Box>
-                    ))}
-                </Box>
-            ) : (
-                !loading && (area || date) && <Typography sx={{ marginTop: 3 }}>No properties found.</Typography>
-            )}
+            </Grid>
         </Box>
     );
 };

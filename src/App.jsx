@@ -1,15 +1,19 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Property from './pages/Property.jsx';
 import Signup from './pages/Signup';
 import TenantDashboard from './pages/TenantDashboard';
 import OwnerDashboard from './pages/OwnerDashboard';
+import ProtectedRoute from './routes/ProtectedRoute';
+import Unauthorized from './pages/Unauthorized';
+import AddProperty from './pages/AddProperty';
+import MyProperties from "./pages/MyProperties";
+import PropertyDetails from "./pages/PropertyDetails";
 import ManageRequests from "./pages/ManageRequests";
-import AvailableProperties from "./pages/AvailableProperties"; // Import the page
+import PropertySearch from "./pages/PropertySearch";
 import TenantProfile from './pages/TenantProfile';
+import AvailableProperties from "./pages/AvailableProperties"; // Import the page
 
 
 function App() {
@@ -18,46 +22,28 @@ function App() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/property/:id" element={<Property />} />
                 <Route path="/signup" element={<Signup />} />
+                <Route path="/search" element={<PropertySearch />} />
+                <Route path="/property/:id" element={<PropertyDetails />} />
+
+                <Route element={<ProtectedRoute allowedRoles={['ROLE_TENANT']} />}>
+                    <Route path="/tenant-dashboard" element={<TenantDashboard />} />
+                    <Route path="/profile" element={<TenantProfile />} />
+                    <Route path="/manage-requests" element={<ManageRequests />} />
+                </Route>
                 <Route path="/available" element={<AvailableProperties />} />
-                <Route path="/tenant-dashboard" element={<TenantDashboard />} />
-                <Route path="/owner-dashboard" element={<OwnerDashboard />} />
-                <Route path="/profile" element={<TenantProfile />} />
-                <Route path="/manage-requests" element={<ManageRequests />} />
+
+                <Route element={<ProtectedRoute allowedRoles={['ROLE_OWNER']} />}>
+                    <Route path="/owner-dashboard" element={<OwnerDashboard />} />
+                    <Route path="/add-property" element={<AddProperty />} />
+                    <Route path="/my-properties" element={<MyProperties />} />
+                </Route>
+
+                <Route path="/unauthorized" element={<Unauthorized />} />
+
             </Routes>
         </Router>
     );
 }
 
 export default App;
-
-
-// import React from 'react';
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// import Home from './pages/Home';
-// import Login from './pages/Login';
-// import Dashboard from './pages/Dashboard';
-// import Property from './pages/Property';
-// import Signup from './pages/Signup';
-// import TenantDashboard from './pages/TenantDashboard';
-// import OwnerDashboard from './pages/OwnerDashboard';
-//
-// function App() {
-//     return (
-//         <Router>
-//             <Routes>
-//                 <Route path="/" element={<Home />} />
-//                 <Route path="/login" element={<Login />} />
-//                 <Route path="/dashboard" element={<Dashboard />} />
-//                 <Route path="/properties" element={<Property />} />
-//                 <Route path="/signup" element={<Signup />} />
-//                 <Route path="/tenant-dashboard" element={<TenantDashboard />} />
-//                 <Route path="/owner-dashboard" element={<OwnerDashboard />} />
-//             </Routes>
-//         </Router>
-//     );
-// }
-//
-// export default App;
