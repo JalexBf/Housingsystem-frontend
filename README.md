@@ -86,7 +86,7 @@ frontend/
 ## Environment Variables
 Create a **`.env`** file in the root directory:
 ```sh
-VITE_API_BASE_URL=http://localhost:8080
+VITE_API_BASE_URL=http://localhost:5173
 ```
 
 ---
