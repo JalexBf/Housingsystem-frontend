@@ -1,7 +1,7 @@
 # Property Rental Management System
 
 ## Overview
-This is the fronend for a **Property Rental Management System** built in **React** with **Vite** and **Material-UI**. It allows users to **browse, search, list, and manage properties**, supporting **role-based access control (RBAC)** for **owners, tenants, and admins**.
+This is the frontend for a **Property Rental Management System** built in **React** with **Vite** and **Material-UI**. It allows users to **browse, search, list, and manage properties**, supporting **role-based access control (RBAC)** for **owners, tenants, and admins**.
 
 ---
 
