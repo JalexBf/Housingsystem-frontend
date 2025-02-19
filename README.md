@@ -1,7 +1,7 @@
-# Property Rental Management System
+# Property Rental Management System - Frontend
 
 ## Overview
-This is the frontend for a **Property Rental Management System** built in **React** with **Vite** and **Material-UI**. It allows users to **browse, search, list, and manage properties**, supporting **role-based access control (RBAC)** for **owners, tenants, and admins**.
+This is the frontend service for a **Property Rental Management System** built in **React** with **Vite** and **Material-UI**. It allows users to **browse, search, list, and manage properties**, supporting **role-based access control (RBAC)** for **owners, tenants, and admins**.
 
 ---
 
@@ -47,8 +47,8 @@ This is the frontend for a **Property Rental Management System** built in **Reac
 
 ### Clone the repository:
 ```sh
-git clone https://github.com/your-repo/property-rental-system.git
-cd property-rental-system
+git clone https://github.com/JalexBf/Housingsystem-frontend
+cd Housingsystem-frontend
 ```
 
 ### Install dependencies:
