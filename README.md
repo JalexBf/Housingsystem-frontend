@@ -4,6 +4,10 @@
 This is the frontend service for a **Property Rental Management System** built in **React** with **Vite** and **Material-UI**. It allows users to **browse, search, list, and manage properties**, supporting **role-based access control (RBAC)** for **owners, tenants, and admins**.
 
 ---
+## Log-in
+**Password for Admin user is currently:** 'password123'
+
+---
 
 ## Features
 

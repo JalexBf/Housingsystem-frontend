@@ -13,7 +13,8 @@ import PropertyDetails from "./pages/PropertyDetails";
 import ManageRequests from "./pages/ManageRequests";
 import PropertySearch from "./pages/PropertySearch";
 import TenantProfile from './pages/TenantProfile';
-import AvailableProperties from "./pages/AvailableProperties"; // Import the page
+import AvailableProperties from "./pages/AvailableProperties";
+import ManageViewingRequests from "./pages/ManageViewingRequests"
 
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
                     <Route path="/owner-dashboard" element={<OwnerDashboard />} />
                     <Route path="/add-property" element={<AddProperty />} />
                     <Route path="/my-properties" element={<MyProperties />} />
+                    <Route path="/viewing-requests" element={<ManageViewingRequests />} />
                 </Route>
 
                 <Route path="/unauthorized" element={<Unauthorized />} />
