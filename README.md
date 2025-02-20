@@ -5,6 +5,9 @@ This is the frontend service for a **Property Rental Management System** built i
 
 ---
 ## Log-in
+- **Admin Panel**: Admin users log in through the **backend** at `http://localhost:8080`.
+- **User Interface**: Owners and tenants log in through the **frontend** at `http://localhost:5173`.
+
 **Password for Admin user is currently:** 'password123'
 
 ---
@@ -49,11 +52,20 @@ This is the frontend service for a **Property Rental Management System** built i
 
 ## Installation
 
-### Clone the repository:
+### Clone the repositories:
+#### Backend:
+```sh
+git clone https://github.com/JalexBf/Housingsystem
+cd Housingsystem
+mvn clean install
+mvn spring-boot:run
+```
+#### Frontend:
 ```sh
 git clone https://github.com/JalexBf/Housingsystem-frontend
 cd Housingsystem-frontend
 ```
+
 
 ### Install dependencies:
 ```sh
