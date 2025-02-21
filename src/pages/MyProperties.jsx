@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
-import { Box, Typography, Card, CardContent, CardMedia, Grid, Button, CircularProgress } from "@mui/material";
+import {
+    Box,
+    Typography,
+    Card,
+    CardContent,
+    CardMedia,
+    Grid,
+    Button,
+    CircularProgress,
+    AppBar,
+    Toolbar
+} from "@mui/material";
 import axios from "axios";
 
 const MyProperties = () => {
@@ -59,6 +70,23 @@ const MyProperties = () => {
         }
     };
 
+    const handleLogout = () => {
+        const token = localStorage.getItem("token")
+        axios.post("http://localhost:8080/api/logout", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then(() => {
+                localStorage.removeItem("authToken");
+                localStorage.removeItem("userId");
+                localStorage.removeItem("user");
+                localStorage.removeItem("username");
+                navigate("/login");
+            })
+            .catch((error) => console.error("Logout failed:", error));
+    };
+
     if (loading) {
         return (
             <Box sx={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
@@ -72,7 +100,18 @@ const MyProperties = () => {
     }
 
     return (
-        <Box sx={{ padding: 4 }}>
+        <Box sx={{  minHeight: "100vh", width: "100vw", display: "flex", flexDirection: "column",  margin: "auto", backgroundColor: "#f5f5f5", color: "#3f51b5", overflow: "auto" }}>
+
+            <AppBar position="static" sx={{ backgroundColor: "#3f51b5", color: "white" }}>
+                <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="h6">My Properties</Typography>
+                    <Box>
+                        <Button color="inherit" onClick={() => navigate("/owner-dashboard")}>Home</Button>
+                        <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                    </Box>
+                </Toolbar>
+            </AppBar>
+
             <Grid container spacing={2}>
                 {properties.map((property) => (
                     <Grid item xs={12} sm={8} md={6} key={property.id}>

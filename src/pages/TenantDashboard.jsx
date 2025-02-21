@@ -33,10 +33,17 @@ const TenantDashboard = () => {
     }, []);
 
     const handleLogout = () => {
-        axios.post("http://localhost:8080/api/logout")
+        const token = localStorage.getItem("token")
+        axios.post("http://localhost:8080/api/logout", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
             .then(() => {
                 localStorage.removeItem("authToken");
                 localStorage.removeItem("userId");
+                localStorage.removeItem("user");
+                localStorage.removeItem("username");
                 navigate("/login");
             })
             .catch((error) => console.error("Logout failed:", error));
@@ -76,7 +83,7 @@ const TenantDashboard = () => {
                     <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("/available")}>
                         View Available Properties
                     </Button>
-                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("//manage-requests")}>
+                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("/manage-requests")}>
                         Manage Requests
                     </Button>
                 </Box>

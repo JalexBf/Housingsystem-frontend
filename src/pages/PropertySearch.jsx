@@ -27,6 +27,23 @@ const PropertySearch = () => {
         }
     };
 
+    const handleLogout = () => {
+        const token = localStorage.getItem("token")
+        axios.post("http://localhost:8080/api/logout", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then(() => {
+                localStorage.removeItem("authToken");
+                localStorage.removeItem("userId");
+                localStorage.removeItem("user");
+                localStorage.removeItem("username");
+                navigate("/login");
+            })
+            .catch((error) => console.error("Logout failed:", error));
+    };
+
     if (loading) {
         return (
             <Box sx={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
@@ -34,9 +51,8 @@ const PropertySearch = () => {
             </Box>
         );
     }
-
     return (
-        <Box sx={{ padding: 4 }}>
+        <Box sx={{ padding: 4, backgroundColor: "#f5f5f5", }}>
             <SearchBar onSearch={fetchProperties} /> {/* ✅ Add SearchBar */}
 
             <Grid container spacing={2}>

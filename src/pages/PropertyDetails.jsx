@@ -14,7 +14,7 @@ import {
     MenuItem,
     List,
     ListItem,
-    ListItemText,
+    ListItemText, AppBar, Toolbar,
 } from "@mui/material";
 
 const PropertyDetails = () => {
@@ -119,38 +119,81 @@ const PropertyDetails = () => {
         setViewingDialogOpen(false);
     };
 
+    const handleLogout = () => {
+        const token = localStorage.getItem("token")
+        axios.post("http://localhost:8080/api/logout", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then(() => {
+                localStorage.removeItem("authToken");
+                localStorage.removeItem("userId");
+                localStorage.removeItem("user");
+                localStorage.removeItem("username");
+                navigate("/login");
+            })
+            .catch((error) => console.error("Logout failed:", error));
+    };
+
     if (loading) return <Typography>Loading...</Typography>;
 
     return (
-        <Box sx={{ padding: 4, maxWidth: 800, margin: "auto" }}>
-            <Typography variant="h4" sx={{ fontWeight: "bold", marginBottom: 2 }}>
+        <Box sx={{  minHeight: "100vh", width: "100vw", display: "flex", flexDirection: "column",  margin: "auto", backgroundColor: "#f5f5f5", color: "#3f51b5", overflow: "auto"}}>
+            {userRole === "ROLE_OWNER" && (
+            <AppBar position="static" sx={{ backgroundColor: "#3f51b5", color: "white" }}>
+                <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="h6">Property Details Dashboard</Typography>
+                    <Box>
+                        <Button color="inherit" onClick={() => navigate("/owner-dashboard")}>Home</Button>
+                        <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                    </Box>
+                </Toolbar>
+            </AppBar>
+            )}
+
+            {userRole === "ROLE_TENANT" && (
+            <AppBar position="static" sx={{ backgroundColor: "#3f51b5", color: "white" }}>
+                <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="h6">Property Details</Typography>
+                    <Box>
+                        <Button color="inherit" onClick={() => navigate("/tenant-dashboard")}>Home</Button>
+                        <Button color="inherit" onClick={() => navigate("/profile")}>Profile</Button>
+                        <Button color="inherit" onClick={() => navigate("/available")}>Properties</Button>
+                        <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                    </Box>
+                </Toolbar>
+            </AppBar>
+            )}
+
+            <Typography variant="h4" sx={{ fontWeight: "bold", marginBottom: 2, padding: 4 }}>
                 {property?.category ? property.category.charAt(0) + property.category.slice(1).toLowerCase() : "Unknown"}
                 {property?.area ? `, ${property.area}` : ""}
             </Typography>
 
-            <Typography variant="body1">
+            <Typography variant="body1" sx={{ padding: 2}}>
                 📍 <strong>Address:</strong> {property?.address || "No address available"}
             </Typography>
 
-            <Typography variant="body1">💰 <strong>Price:</strong> {property?.price ? `€${property.price}` : "Not listed"}</Typography>
+            <Typography variant="body1" sx={{ padding: 2}}>💰 <strong>Price:</strong> {property?.price ? `€${property.price}` : "Not listed"}</Typography>
 
-            <Typography variant="body1">
+            <Typography variant="body1" sx={{ padding: 2}}>
                 📐 <strong>Square Meters:</strong> {property?.squareMeters ? `${property.squareMeters} m²` : "Not specified"}
             </Typography>
 
             <Divider sx={{ marginY: 2 }} />
 
-            <Typography variant="h6" sx={{ fontWeight: "bold" }}>Property Details</Typography>
+            <Typography variant="h6" sx={{ padding: 2, fontWeight: "bold" }}>Property Details</Typography>
 
-            <Typography variant="body1">🏢 <strong>Floor:</strong> {property?.floor || "Not specified"}</Typography>
-            <Typography variant="body1">🚪 <strong>Rooms:</strong> {property?.numberOfRooms || "Not specified"}</Typography>
-            <Typography variant="body1">🚿 <strong>Bathrooms:</strong> {property?.numberOfBathrooms || "Not specified"}</Typography>
-            <Typography variant="body1">🛠️ <strong>Renovation Year:</strong> {property?.renovationYear || "Not specified"}</Typography>
+            <Typography variant="body1" sx={{ padding: 2}}>🏢 <strong>Floor:</strong> {property?.floor || "Not specified"}</Typography>
+            <Typography variant="body1" sx={{ padding: 2}}>🚪 <strong>Rooms:</strong> {property?.numberOfRooms || "Not specified"}</Typography>
+            <Typography variant="body1" sx={{ padding: 2}}>🚿 <strong>Bathrooms:</strong> {property?.numberOfBathrooms || "Not specified"}</Typography>
+            <Typography variant="body1" sx={{ padding: 2}}>🛠️ <strong>Renovation Year:</strong> {property?.renovationYear || "Not specified"}</Typography>
 
             <Divider sx={{ marginY: 2 }} />
 
-            <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 1 }}>Photos</Typography>
-            <Box sx={{ display: "flex", gap: 2, marginTop: 2, overflowX: "auto" }}>
+            <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 1, padding: 2 }}>Photos</Typography>
+            <Box sx={{ display: "flex", gap: 2, marginTop: 2, overflowX: "auto" , padding: 2}}>
                 {property?.photos?.length > 0 ? (
                     property.photos.map((photoUrl, index) => (
                         <img key={index} src={`http://localhost:8080${photoUrl}`} alt="Property" width="200" />
@@ -162,7 +205,7 @@ const PropertyDetails = () => {
 
             <Divider sx={{ marginY: 2 }} />
 
-            <Typography variant="h4" color="primary">Amenities</Typography>
+            <Typography variant="h4" color="primary" sx={{ padding: 2, colour: "#3f51b5"}}>Amenities</Typography>
             <Box sx={{ padding: 2, border: "1px solid #ddd", borderRadius: 2, boxShadow: 1 }}>
                 {amenities.length > 0 ? (
                     amenities.map((amenity) => (
@@ -175,7 +218,7 @@ const PropertyDetails = () => {
                 )}
             </Box>
 
-            <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 1 }}>Availability Slots</Typography>
+            <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 1, padding: 2 }}>Availability Slots</Typography>
             <List>
                 {availabilitySlots.length > 0 ? (
                     availabilitySlots.map((slot) => (
@@ -191,21 +234,22 @@ const PropertyDetails = () => {
             </List>
 
             {userRole === "ROLE_TENANT" && (
-                <>
-                    <Button variant="contained" color="primary" sx={{ marginTop: 2, marginRight: 2 }} onClick={() => {
+                <Box sx={{ display: "flex", gap: 2, marginTop: 2, justifyContent: "flex-start", paddingLeft: 2, marginBottom: 2 }}>
+                    <Button variant="contained" color="primary" onClick={() => {
                         setRequestType("viewing");
                         setViewingDialogOpen(true);
                     }}>
                         Request Viewing
                     </Button>
-                    <Button variant="contained" color="secondary" sx={{ marginTop: 2 }} onClick={() => {
+                    <Button variant="contained" color="secondary" onClick={() => {
                         setRequestType("rental");
                         setConfirmDialogOpen(true);
                     }}>
                         Request Rental
                     </Button>
-                </>
+                </Box>
             )}
+
 
             {userRole === "ROLE_OWNER" && userId === property?.ownerId && (
                 <Button variant="contained" color="error" sx={{ marginTop: 2 }} onClick={handleDelete}>

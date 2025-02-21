@@ -8,7 +8,7 @@ import {
     FormControl,
     Select,
     MenuItem,
-    InputLabel
+    InputLabel, AppBar, Toolbar
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -138,9 +138,37 @@ const AddProperty = () => {
     };
 
 
+    const handleLogout = () => {
+        const token = localStorage.getItem("token")
+        axios.post("http://localhost:8080/api/logout", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then(() => {
+                localStorage.removeItem("authToken");
+                localStorage.removeItem("userId");
+                localStorage.removeItem("user");
+                localStorage.removeItem("username");
+                navigate("/login");
+            })
+            .catch((error) => console.error("Logout failed:", error));
+    };
+
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
-            <Paper elevation={3} sx={{ padding: 4, width: '100%', maxWidth: 600 }}>
+        <Box sx={{  minHeight: "100vh", width: "100vw", display: "flex", flexDirection: "column", backgroundColor: "#f5f5f5", overflow: "auto" }}>
+
+            <AppBar position="static" sx={{ backgroundColor: "#3f51b5", color: "white" }}>
+                <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="h6">Add a Property</Typography>
+                    <Box>
+                        <Button color="inherit" onClick={() => navigate("/owner-dashboard")}>Home</Button>
+                        <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                    </Box>
+                </Toolbar>
+            </AppBar>
+
+            <Paper elevation={3} sx={{ padding: 4, width: '100%', maxWidth: 600, alignSelf: "center" }}>
                 <Typography variant="h5" sx={{ marginBottom: 2 }}>Add New Property</Typography>
                 <form onSubmit={handleSubmit}>
                     <FormControl fullWidth sx={{ marginBottom: 2 }}>
