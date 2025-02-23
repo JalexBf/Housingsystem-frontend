@@ -3,7 +3,7 @@ import { Button, Box, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 export default function OwnerDashboard() {
-    const navigate = useNavigate(); // Initialize navigation
+    const navigate = useNavigate();
 
     return (
         <Box
@@ -36,13 +36,12 @@ export default function OwnerDashboard() {
                     Owner Dashboard
                 </Typography>
 
-                {/* Corrected Add Property Button with Navigation */}
                 <Button
                     variant="contained"
                     color="primary"
                     size="large"
                     sx={{ marginBottom: 2, width: "300px" }}
-                    onClick={() => navigate('/add-property')}  // Navigate to AddProperty page
+                    onClick={() => navigate('/add-property')}
                 >
                     Add New Property
                 </Button>
@@ -62,14 +61,10 @@ export default function OwnerDashboard() {
                     color="primary"
                     size="large"
                     sx={{ marginBottom: 2, width: "300px" }}
-                    onClick={() => {
-                        console.log("Navigating to /manage-viewing-requests");
-                        navigate('/manage-viewing-requests');
-                    }}
+                    onClick={() => navigate('/viewing-requests')}  // Added navigation
                 >
-                    Manage Viewing Requests
+                    Manage Property Requests
                 </Button>
-
             </Box>
         </Box>
     );

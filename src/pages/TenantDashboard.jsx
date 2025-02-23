@@ -26,7 +26,7 @@ const TenantDashboard = () => {
                     console.log("Is response an array?", Array.isArray(response.data));
                 })
                 .catch((error) => console.error("Error fetching tenant info:", error));
-                console.log("tenant on dashboard: ", tenant)
+            console.log("tenant on dashboard: ", tenant)
         }else {
             console.error("No tenant ID found in localStorage");
         }
@@ -51,7 +51,7 @@ const TenantDashboard = () => {
                     <Box>
                         <Button color="inherit" onClick={() => navigate("/tenant-dashboard")}>Home</Button>
                         <Button color="inherit" onClick={() => navigate("/profile")}>Profile</Button>
-                        <Button color="inherit" onClick={() => navigate("/search")}>Properties</Button>
+                        <Button color="inherit" onClick={() => navigate("/available")}>Properties</Button>
                         <Button color="inherit" onClick={handleLogout}>Logout</Button>
                     </Box>
                 </Toolbar>
@@ -73,10 +73,10 @@ const TenantDashboard = () => {
 
                 {/* Tenant Options */}
                 <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("/search")}>
+                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("/available")}>
                         View Available Properties
                     </Button>
-                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("/manage-requests")}>
+                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("//manage-requests")}>
                         Manage Requests
                     </Button>
                 </Box>
@@ -86,3 +86,4 @@ const TenantDashboard = () => {
 };
 
 export default TenantDashboard;
+

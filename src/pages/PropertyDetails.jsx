@@ -12,6 +12,9 @@ import {
     DialogActions,
     Select,
     MenuItem,
+    List,
+    ListItem,
+    ListItemText,
 } from "@mui/material";
 
 const PropertyDetails = () => {
@@ -23,7 +26,8 @@ const PropertyDetails = () => {
     const [requestType, setRequestType] = useState("");
     const [viewingDialogOpen, setViewingDialogOpen] = useState(false);
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-    const [selectedSlot, setSelectedSlot] = useState("");
+    const [amenities, setAmenities] = useState([]);
+    const [selectedSlot, setSelectedSlot] = useState(null);
     const [availabilitySlots, setAvailabilitySlots] = useState([]);
     const navigate = useNavigate();
 
@@ -33,6 +37,9 @@ const PropertyDetails = () => {
                 const response = await axios.get(`http://localhost:8080/api/properties/${id}`);
                 setProperty(response.data);
                 setAvailabilitySlots(response.data.availabilitySlots || []);
+                setAmenities(propertyData.amenities || []);
+                console.log("Received property details data:", response.data);
+                console.log("Received propertyData data:", Array.isArray(response.data) && response.data.length > 0 ? response.data[0] : response.data);
             } catch (error) {
                 console.error("Error fetching property details:", error);
             } finally {
@@ -80,43 +87,37 @@ const PropertyDetails = () => {
     };
 
     const handleRequest = async () => {
+        const tenantId = localStorage.getItem("userId");
         const token = localStorage.getItem("token");
-        if (!token) {
-            alert("Authentication error. Please log in.");
-            return;
-        }
-
-        const tenantId = localStorage.getItem("userId"); // Ensure this is correct
-        if (!tenantId) {
-            alert("Tenant ID not found. Please log in again.");
-            return;
-        }
-
-        if (!selectedSlot || !selectedSlot.id) {
-            alert("Please select a viewing slot.");
-            return;
-        }
-
         const requestData = {
-            propertyId: id,
-            availabilitySlotId: selectedSlot.id,
+            property: { id: id },
+            tenant: { id: tenantId },
+            status: "PENDING",
         };
 
-        console.log("Sending request:", requestData);
+        if (requestType === "viewing") {
+            if (!selectedSlot) {
+                alert("Please select a viewing slot.");
+                return;
+            }
+            requestData.availabilitySlot = { id: selectedSlot.id };
+        }
 
         try {
             await axios.post(
-                `http://localhost:8080/api/tenants/${tenantId}/add-viewing-request`,
+                `http://localhost:8080/api/tenants/${tenantId}/add-${requestType}-request`,
                 requestData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert("Viewing request sent successfully!");
+            alert(`${requestType.charAt(0).toUpperCase() + requestType.slice(1)} request sent successfully!`);
         } catch (error) {
-            console.error("Error sending viewing request:", error);
-            alert("Failed to send viewing request.");
+            console.error(`Error sending ${requestType} request:`, error);
+            alert(`Failed to send ${requestType} request.`);
         }
-    };
 
+        setConfirmDialogOpen(false);
+        setViewingDialogOpen(false);
+    };
 
     if (loading) return <Typography>Loading...</Typography>;
 
@@ -152,17 +153,42 @@ const PropertyDetails = () => {
             <Box sx={{ display: "flex", gap: 2, marginTop: 2, overflowX: "auto" }}>
                 {property?.photos?.length > 0 ? (
                     property.photos.map((photoUrl, index) => (
-                        <img
-                            key={index}
-                            src={`http://localhost:8080${photoUrl}`}
-                            alt={`Property ${index + 1}`}
-                            width="200"
-                        />
+                        <img key={index} src={`http://localhost:8080${photoUrl}`} alt="Property" width="200" />
                     ))
                 ) : (
                     <Typography>No photos available.</Typography>
                 )}
             </Box>
+
+            <Divider sx={{ marginY: 2 }} />
+
+            <Typography variant="h4" color="primary">Amenities</Typography>
+            <Box sx={{ padding: 2, border: "1px solid #ddd", borderRadius: 2, boxShadow: 1 }}>
+                {amenities.length > 0 ? (
+                    amenities.map((amenity) => (
+                        <Typography key={amenity.id}>
+                            amenity
+                        </Typography>
+                    ))
+                ) : (
+                    <Typography color="error">This property doesn't offer any extra amenities.</Typography>
+                )}
+            </Box>
+
+            <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 1 }}>Availability Slots</Typography>
+            <List>
+                {availabilitySlots.length > 0 ? (
+                    availabilitySlots.map((slot) => (
+                        <ListItem key={slot.id}>
+                            <ListItemText
+                                primary={`${slot.dayOfWeek} ${slot.startHour}:00 - ${slot.endHour}:00`}
+                            />
+                        </ListItem>
+                    ))
+                ) : (
+                    <Typography>No availability slots available.</Typography>
+                )}
+            </List>
 
             {userRole === "ROLE_TENANT" && (
                 <>
@@ -201,11 +227,7 @@ const PropertyDetails = () => {
             <Dialog open={viewingDialogOpen} onClose={() => setViewingDialogOpen(false)}>
                 <DialogTitle>Select a Viewing Time</DialogTitle>
                 <DialogContent>
-                    <Select
-                        fullWidth
-                        value={selectedSlot || ""} // Ensures no null value
-                        onChange={(e) => setSelectedSlot(e.target.value)}
-                    >
+                    <Select fullWidth value={selectedSlot} onChange={(e) => setSelectedSlot(e.target.value)}>
                         {availabilitySlots.map((slot) => (
                             <MenuItem key={slot.id} value={slot}>
                                 {slot.dayOfWeek} {slot.startHour}:00 - {slot.endHour}:00

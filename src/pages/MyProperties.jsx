@@ -81,7 +81,7 @@ const MyProperties = () => {
                                 <CardMedia
                                     component="img"
                                     height="250"
-                                    image={`http://localhost:8080${property.photos[0]}`}
+                                    image={`http://localhost:8080${property.photos[0]}`}  // ✅ Uses first photo
                                     alt="Property Image"
                                     sx={{ objectFit: "cover" }}
                                 />
@@ -89,7 +89,7 @@ const MyProperties = () => {
                                 <CardMedia
                                     component="img"
                                     height="250"
-                                    image="/default-property-image.jpg"
+                                    image="/default-image.jpg"  // ✅ Fallback image
                                     alt="No Image Available"
                                     sx={{ objectFit: "cover" }}
                                 />
