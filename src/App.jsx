@@ -13,8 +13,8 @@ import PropertyDetails from "./pages/PropertyDetails";
 import PropertySearch from "./pages/PropertySearch";
 import Dashboard from './pages/Dashboard';
 import Property from './pages/Property.jsx';
-import AvailableProperties from "./pages/AvailableProperties";
 import ManageViewingRequests from "./pages/ManageViewingRequests";
+import ManageRequests from "./pages/ManageRequests";
 
 
 
@@ -28,11 +28,11 @@ function App() {
                 <Route path="/search" element={<PropertySearch />} />
                 <Route path="/property/:id" element={<PropertyDetails />} />
                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/available" element={<AvailableProperties />} />
                 <Route path="/property/:id" element={<Property />} />
 
                 <Route element={<ProtectedRoute allowedRoles={['ROLE_TENANT']} />}>
                     <Route path="/tenant-dashboard" element={<TenantDashboard />} />
+                    <Route path="/manage-requests" element={<ManageRequests />} />
                 </Route>
 
                 <Route element={<ProtectedRoute allowedRoles={['ROLE_OWNER']} />}>

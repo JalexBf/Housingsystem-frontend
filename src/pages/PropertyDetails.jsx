@@ -152,7 +152,12 @@ const PropertyDetails = () => {
             <Box sx={{ display: "flex", gap: 2, marginTop: 2, overflowX: "auto" }}>
                 {property?.photos?.length > 0 ? (
                     property.photos.map((photoUrl, index) => (
-                        <img key={index} src={`http://localhost:8080${photoUrl}`} alt="Property" width="200" />
+                        <img
+                            key={index}
+                            src={`http://localhost:8080${photoUrl}`}
+                            alt={`Property ${index + 1}`}
+                            width="200"
+                        />
                     ))
                 ) : (
                     <Typography>No photos available.</Typography>

@@ -51,7 +51,7 @@ const TenantDashboard = () => {
                     <Box>
                         <Button color="inherit" onClick={() => navigate("/tenant-dashboard")}>Home</Button>
                         <Button color="inherit" onClick={() => navigate("/profile")}>Profile</Button>
-                        <Button color="inherit" onClick={() => navigate("/available")}>Properties</Button>
+                        <Button color="inherit" onClick={() => navigate("/search")}>Properties</Button>
                         <Button color="inherit" onClick={handleLogout}>Logout</Button>
                     </Box>
                 </Toolbar>
@@ -73,10 +73,10 @@ const TenantDashboard = () => {
 
                 {/* Tenant Options */}
                 <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("/available")}>
+                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("/search")}>
                         View Available Properties
                     </Button>
-                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("//manage-requests")}>
+                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("/manage-requests")}>
                         Manage Requests
                     </Button>
                 </Box>
@@ -86,70 +86,3 @@ const TenantDashboard = () => {
 };
 
 export default TenantDashboard;
-
-
-//
-// import React from 'react';
-// import { Box, Typography, Button } from '@mui/material';
-// import { useNavigate } from 'react-router-dom';
-//
-// const TenantDashboard = () => {
-//     const navigate = useNavigate();
-//
-//     return (
-//         <Box
-//             sx={{
-//                 display: 'flex',
-//                 flexDirection: 'column',
-//                 alignItems: 'center',
-//                 justifyContent: 'center',
-//                 height: '100vh',
-//                 width: '100vw',
-//                 backgroundColor: '#f5f5f5',
-//                 margin: 0,
-//                 padding: 0,
-//                 overflow: 'hidden', // Ensures no scrollbars
-//             }}
-//         >
-//             <Typography
-//                 variant="h4"
-//                 sx={{
-//                     marginBottom: 4,
-//                     fontWeight: 'bold',
-//                     color: '#3f51b5',
-//                     textAlign: 'center',
-//                 }}
-//             >
-//                 Tenant Dashboard
-//             </Typography>
-//
-//             <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-//                 <Button
-//                     variant="contained"
-//                     sx={{ width: '300px' }}
-//                     onClick={() => navigate('/properties')}
-//                 >
-//                     View Available Property
-//                 </Button>
-//
-//                 <Button
-//                     variant="contained"
-//                     sx={{ width: '300px' }}
-//                     onClick={() => navigate('/rental-requests')}
-//                 >
-//                     Manage Rental Requests
-//                 </Button>
-//
-//                 <Button
-//                     variant="contained"
-//                     sx={{ width: '300px' }}
-//                     onClick={() => navigate('/viewing-requests')}
-//                 >
-//                     Manage Viewing Requests
-//                 </Button>
-//             </Box>
-//         </Box>
-//     );
-// };
-//
-// export default TenantDashboard;

@@ -92,13 +92,20 @@ const AddProperty = () => {
 
     const checkAtakAvailability = async (atak) => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/properties/check-atak?atak=${atak}`);
+            const token = localStorage.getItem('token'); // Retrieve the token from storage
+            const response = await axios.get(`http://localhost:8080/api/properties/check-atak?atak=${atak}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Include token in request
+                },
+            });
             return response.data.exists; // true if ATAK exists, false otherwise
         } catch (error) {
             console.error("Error checking ATAK availability", error);
             return true; // Assume ATAK is taken if there's an error
         }
     };
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -118,28 +125,34 @@ const AddProperty = () => {
             const token = localStorage.getItem('token');
             const formDataToSend = new FormData();
 
+            // Create propertyData object
+            const propertyData = {
+                category: formData.category,
+                area: formData.area,
+                address: formData.address,
+                atak: formData.atak,
+                price: parseFloat(formData.price),
+                squareMeters: parseInt(formData.squareMeters),
+                floor: parseInt(formData.floor),
+                numberOfRooms: parseInt(formData.numberOfRooms),
+                numberOfBathrooms: parseInt(formData.numberOfBathrooms),
+                renovationYear: parseInt(formData.renovationYear),
+                amenities: formData.amenities,
+                availabilitySlots: formData.availabilitySlots.map(slot => ({
+                    dayOfWeek: slot.dayOfWeek,
+                    startHour: parseInt(slot.startHour),
+                    endHour: parseInt(slot.endHour),
+                }))
+            };
+
+            console.log("Sending propertyData:", JSON.stringify(propertyData));
+
             formDataToSend.append(
                 "property",
-                new Blob([JSON.stringify({
-                    category: formData.category,
-                    area: formData.area,
-                    address: formData.address,
-                    atak: formData.atak,
-                    price: parseFloat(formData.price),
-                    squareMeters: parseInt(formData.squareMeters),
-                    floor: parseInt(formData.floor),
-                    numberOfRooms: parseInt(formData.numberOfRooms),
-                    numberOfBathrooms: parseInt(formData.numberOfBathrooms),
-                    renovationYear: parseInt(formData.renovationYear),
-                    amenities: formData.amenities,
-                    availabilitySlots: formData.availabilitySlots.map(slot => ({
-                        dayOfWeek: slot.dayOfWeek,
-                        startHour: parseInt(slot.startHour),
-                        endHour: parseInt(slot.endHour),
-                    }))
-                })], { type: "application/json" })
+                new Blob([JSON.stringify(propertyData)], { type: "application/json" })
             );
 
+            // Append photos
             for (const file of formData.photos) {
                 formDataToSend.append("files", file);
             }
@@ -157,9 +170,11 @@ const AddProperty = () => {
 
             navigate("/owner-dashboard");
         } catch (err) {
-            alert("Submission failed.");
+            console.error("Error submitting property:", err);
+            alert("Submission failed. Please check the console for details.");
         }
     };
+
 
 
     return (
@@ -180,9 +195,58 @@ const AddProperty = () => {
                     <TextField fullWidth label="ATAK" name="atak" value={formData.atak} onChange={handleChange} required sx={{ marginBottom: 2 }} />
                     <TextField fullWidth type="number" label="Price" name="price" value={formData.price} onChange={handleChange} required sx={{ marginBottom: 2 }} />
                     <TextField fullWidth type="number" label="Square Meters" name="squareMeters" value={formData.squareMeters} onChange={handleChange} required sx={{ marginBottom: 2 }} />
-                    <TextField fullWidth type="number" label="Floor" name="floor" value={formData.floor} onChange={handleChange} required sx={{ marginBottom: 2 }} />
-                    <TextField fullWidth type="number" label="Number of Rooms" name="numberOfRooms" value={formData.numberOfRooms} onChange={handleChange} required sx={{ marginBottom: 2 }} />
-                    <TextField fullWidth type="number" label="Number of Bathrooms" name="numberOfBathrooms" value={formData.numberOfBathrooms} onChange={handleChange} required sx={{ marginBottom: 2 }} />
+                    <TextField
+                        fullWidth
+                        type="number"
+                        label="Floor"
+                        name="floor"
+                        value={formData.floor}
+                        onChange={handleChange}
+                        required
+                        inputProps={{
+                            min: 0,
+                            max: 10,
+                            step: 1
+                        }}
+                        helperText="Must be between 0 and 10"
+                        error={formData.floor < 0 || formData.floor > 10}
+                        sx={{ marginBottom: 2 }}
+                    />
+
+                    <TextField
+                        fullWidth
+                        type="number"
+                        label="Number of Rooms"
+                        name="numberOfRooms"
+                        value={formData.numberOfRooms}
+                        onChange={handleChange}
+                        required
+                        inputProps={{
+                            min: 1,
+                            max: 10,
+                            step: 1
+                        }}
+                        helperText="Must be between 1 and 10 rooms"
+                        error={formData.numberOfRooms < 1 || formData.numberOfRooms > 10}
+                        sx={{ marginBottom: 2 }}
+                    />
+                    <TextField
+                        fullWidth
+                        type="number"
+                        label="Number of Bathrooms"
+                        name="numberOfBathrooms"
+                        value={formData.numberOfBathrooms}
+                        onChange={handleChange}
+                        required
+                        inputProps={{
+                            min: 1,
+                            max: 10,
+                            step: 1
+                        }}
+                        helperText="Must be between 1 and 10 bathrooms"
+                        error={formData.numberOfBathrooms < 1 || formData.numberOfBathrooms > 10}
+                        sx={{ marginBottom: 2 }}
+                    />
                     <TextField fullWidth type="number" label="Renovation Year" name="renovationYear" value={formData.renovationYear} onChange={handleChange} required sx={{ marginBottom: 2 }} error={!!errors.renovationYear}
                         helperText={errors.renovationYear}
                     />

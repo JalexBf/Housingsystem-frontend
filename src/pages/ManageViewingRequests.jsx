@@ -93,7 +93,6 @@ const ManageViewingRequests = () => {
                                 <TableRow>
                                     <TableCell>Tenant</TableCell>
                                     <TableCell>Property</TableCell>
-                                    <TableCell>Proposed Time</TableCell>
                                     <TableCell>Status</TableCell>
                                     <TableCell>Actions</TableCell>
                                 </TableRow>
@@ -103,7 +102,6 @@ const ManageViewingRequests = () => {
                                     <TableRow key={request.id}>
                                         <TableCell>{request.tenant.username}</TableCell>
                                         <TableCell>{request.property.id}</TableCell>
-                                        <TableCell>{request.proposedTime}</TableCell>
                                         <TableCell>{request.status}</TableCell>
                                         <TableCell>
                                             {request.status === "PENDING" && (
