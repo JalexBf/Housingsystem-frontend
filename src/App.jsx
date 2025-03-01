@@ -10,11 +10,12 @@ import Unauthorized from './pages/Unauthorized';
 import AddProperty from './pages/AddProperty';
 import MyProperties from "./pages/MyProperties";
 import PropertyDetails from "./pages/PropertyDetails";
-import ManageRequests from "./pages/ManageRequests";
 import PropertySearch from "./pages/PropertySearch";
-import TenantProfile from './pages/TenantProfile';
-import AvailableProperties from "./pages/AvailableProperties";
-import ManageViewingRequests from "./pages/ManageViewingRequests"
+import Dashboard from './pages/Dashboard';
+import Property from './pages/Property.jsx';
+import ManageViewingRequests from "./pages/ManageViewingRequests";
+import ManageRequests from "./pages/ManageRequests";
+
 
 
 function App() {
@@ -26,19 +27,19 @@ function App() {
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/search" element={<PropertySearch />} />
                 <Route path="/property/:id" element={<PropertyDetails />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/property/:id" element={<Property />} />
 
                 <Route element={<ProtectedRoute allowedRoles={['ROLE_TENANT']} />}>
                     <Route path="/tenant-dashboard" element={<TenantDashboard />} />
-                    <Route path="/profile" element={<TenantProfile />} />
                     <Route path="/manage-requests" element={<ManageRequests />} />
                 </Route>
-                <Route path="/available" element={<AvailableProperties />} />
 
                 <Route element={<ProtectedRoute allowedRoles={['ROLE_OWNER']} />}>
                     <Route path="/owner-dashboard" element={<OwnerDashboard />} />
                     <Route path="/add-property" element={<AddProperty />} />
                     <Route path="/my-properties" element={<MyProperties />} />
-                    <Route path="/viewing-requests" element={<ManageViewingRequests />} />
+                    <Route path="/manage-viewing-requests" element={<ManageViewingRequests />} />
                 </Route>
 
                 <Route path="/unauthorized" element={<Unauthorized />} />

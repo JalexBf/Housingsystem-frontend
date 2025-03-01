@@ -18,7 +18,10 @@ const MyProperties = () => {
                     return;
                 }
 
-                const response = await axios.get("http://localhost:8080/api/properties", {
+                // Add this line to get the userId from localStorage
+                const userId = localStorage.getItem("userId");
+
+                const response = await axios.get(`http://localhost:8080/api/properties/owner/${userId}`, {
                     headers: {
                         "Authorization": `Bearer ${token}`,
                         "Accept": "application/json",
@@ -81,7 +84,7 @@ const MyProperties = () => {
                                 <CardMedia
                                     component="img"
                                     height="250"
-                                    image={`http://localhost:8080${property.photos[0]}`}  // ✅ Uses first photo
+                                    image={`http://localhost:8080${property.photos[0]}`}
                                     alt="Property Image"
                                     sx={{ objectFit: "cover" }}
                                 />
@@ -89,7 +92,7 @@ const MyProperties = () => {
                                 <CardMedia
                                     component="img"
                                     height="250"
-                                    image="/default-image.jpg"  // ✅ Fallback image
+                                    image="/default-property-image.jpg"
                                     alt="No Image Available"
                                     sx={{ objectFit: "cover" }}
                                 />

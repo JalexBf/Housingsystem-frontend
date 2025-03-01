@@ -73,10 +73,10 @@ const TenantDashboard = () => {
 
                 {/* Tenant Options */}
                 <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("/available")}>
+                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("/search")}>
                         View Available Properties
                     </Button>
-                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("//manage-requests")}>
+                    <Button variant="contained" sx={{ width: "300px" }} onClick={() => navigate("/manage-requests")}>
                         Manage Requests
                     </Button>
                 </Box>
